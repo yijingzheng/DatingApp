@@ -25,6 +25,6 @@ public class client1 {
         System.out.println("Run Time: " + (end - start) * 1.0 / 1000 + "s");
         System.out.println("Successful Requests: " + counter.getSuccessCount());
         System.out.println("Failed Requests: " + counter.getFailCount());
-        System.out.println("Throughout: " + (counter.getSuccessCount()+counter.getFailCount()) / ((end - start) * 1.0 /1000));
+        System.out.println("Throughput: " + (counter.getSuccessCount()+counter.getFailCount()) / ((end - start) * 1.0 /1000));
     }
 }

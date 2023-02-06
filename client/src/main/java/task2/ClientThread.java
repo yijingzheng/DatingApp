@@ -34,7 +34,7 @@ public class ClientThread implements Runnable {
         String swiper = String.valueOf(rand.nextInt(SWIPER_MAX) + 1);
         String swipee = String.valueOf(rand.nextInt(SWIPEE_MAX) + 1);
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 256; i++) {
+        for (int i = 0; i < COMMENT_MAX; i++) {
             sb.append((char)rand.nextInt(128));
         }
         String comment = sb.toString();
