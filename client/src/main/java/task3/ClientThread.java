@@ -21,7 +21,6 @@ public class ClientThread implements Runnable {
     private int requestNumber;
     private Map<Integer, ArrayList<Record>> records;
     private int name;
-//    private ArrayList<Record> myList = new ArrayList<>();
     private final static int RETRY_MAX = 5;
     private final static int SWIPER_MAX = 5000;
     private final static int SWIPEE_MAX = 1000000;
@@ -54,22 +53,19 @@ public class ClientThread implements Runnable {
     @Override
     public void run() {
         for (int i = 0; i < requestNumber; i++) {
-//            if (latch.getCount() == 0) {
-//                records.put(name, myList);
-//                return;
-//            }
+            if (counter.isStop()) {
+                return;
+            }
             int retry = 0;
             while (retry < RETRY_MAX) {
                 try {
                     long start = System.currentTimeMillis();
                     ApiResponse apiResponse = apiInstance.swipeWithHttpInfo(generateBody(), leftOrRight[rand.nextInt(leftOrRight.length)]);
                     long end = System.currentTimeMillis();
-//                    myList.add(new Record(start, "POST", end - start, apiResponse.getStatusCode()));
                     records.get(name).add(new Record(start, "POST", end - start, apiResponse.getStatusCode()));
                     break;
                 } catch (ApiException e) {
                     retry += 1;
-                    System.err.println(e.getCode() + ": " + e.getResponseBody());
                 }
             }
             if (retry < RETRY_MAX) {

@@ -4,6 +4,7 @@ public class Counter {
 
     private int successCount = 0;
     private int failCount = 0;
+    private boolean stop = false;
 
     synchronized public void successInc() {
         successCount += 1;
@@ -19,5 +20,13 @@ public class Counter {
 
     public int getFailCount() {
         return failCount;
+    }
+
+    public boolean isStop() {
+        return stop;
+    }
+
+    public void setStop(boolean stop) {
+        this.stop = stop;
     }
 }

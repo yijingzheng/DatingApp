@@ -44,6 +44,9 @@ public class ClientThread implements Runnable {
     @Override
     public void run() {
         for (int i = 0; i < requestNumber; i++) {
+            if (counter.isStop()) {
+                return;
+            }
             int retry = 0;
             while(retry < RETRY_MAX) {
                 try {
@@ -51,7 +54,6 @@ public class ClientThread implements Runnable {
                     break;
                 } catch (ApiException e) {
                     retry += 1;
-                    System.err.println(e.getCode() + ": " + e.getResponseBody());
                 }
             }
             if (retry < RETRY_MAX) {

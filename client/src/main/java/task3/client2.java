@@ -9,9 +9,9 @@ import java.util.Collections;
 import java.util.concurrent.*;
 
 public class client2 {
-    private final static int THREAD_NUM = 125;
+    private final static int THREAD_NUM = 400;
     private final static int TOTAL_REQUESTS = 500000;
-    private final static String url = "http://52.39.14.34:8080/server_war";
+    private final static String url = "http://52.13.27.242:8080/server_war";
     private final static String path = THREAD_NUM + "-" + TOTAL_REQUESTS + ".csv";
 
     public static void main(String[] args) throws InterruptedException, IOException {
@@ -24,10 +24,9 @@ public class client2 {
             records.put(i, new ArrayList<>());
             ClientThread clientThread = new ClientThread(url, (int)(TOTAL_REQUESTS / THREAD_NUM * 1.1), latch, counter, records, i);
             pool.execute(clientThread);
-//            Thread t = new Thread(clientThread);
-//            t.start();
         }
         latch.await();
+        counter.setStop(true);
         pool.shutdown();
         long end = System.currentTimeMillis();
         System.out.println("Thread Number: " + THREAD_NUM);
@@ -55,7 +54,6 @@ public class client2 {
             }
         }
         fileWriter.close();
-        System.out.println(arr.size());
         Collections.sort(arr, (a, b) -> Long.compare(a.getLatency(), b.getLatency()));
         System.out.println("mean response time (millisecs): " + sum * 1.0 / arr.size());
         System.out.println("median response time (millisecs): " + arr.get(arr.size() / 2).getLatency());
