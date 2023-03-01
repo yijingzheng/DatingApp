@@ -6,6 +6,7 @@ import javax.servlet.annotation.*;
 import java.io.IOException;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import model.*;
 import rmqpool.*;
 import constant.*;
@@ -54,6 +55,7 @@ public class SwipeServlet extends HttpServlet {
 
         String url = request.getPathInfo();
 
+        // validate url
         if (!url.equals(Constant.LEFT) && !url.equals(Constant.RIGHT)) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             response.getWriter().write(Constant.WRONG_URL);
@@ -61,10 +63,10 @@ public class SwipeServlet extends HttpServlet {
             return;
         }
 
-        String status = url.equals(Constant.LEFT) ? Constant.DISLIKE : Constant.LIKE;
         StringBuilder sb = new StringBuilder();
         String s;
 
+        // validate request form
         try {
             while ((s = request.getReader().readLine()) != null) {
                 sb.append(s);
@@ -77,29 +79,43 @@ public class SwipeServlet extends HttpServlet {
 
         SwipeDetails detail = this.gson.fromJson(sb.toString(), SwipeDetails.class);
 
-        if (!detail.isValid()) {
+        if (!isValid(detail)) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write(Constant.INVALID_INPUT);
             response.getWriter().flush();
-        }
-
-        if (pool == null) {
-            System.out.println("why is pool null");
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write("why is pool null");
             return;
         }
+
+        JsonObject info = new JsonObject();
+        String status = url.equals(Constant.LEFT) ? Constant.DISLIKE : Constant.LIKE;
+        info.addProperty(Constant.STATUS, status);
+        info.addProperty(Constant.SWIPER, detail.getSwiper());
+        info.addProperty(Constant.SWIPEE, detail.getSwipee());
+
         Channel channel = pool.borrowObject();
-        channel.queueDeclare(Constant.STATUS_QUEUE, false, false, false, null);
-        channel.queueDeclare(Constant.MATCHES_QUEUE, false, false, false, null);
-        channel.basicPublish("", Constant.STATUS_QUEUE, null, status.getBytes());
-        if (status.equals(Constant.LIKE)) {
-            channel.basicPublish("", Constant.MATCHES_QUEUE, null, this.gson.toJson(detail).toString().getBytes());
-        }
+        // exchange is declared in channel pool
+        channel.basicPublish(Constant.EXCHANGE_NAME, "", null, info.toString().getBytes());
         pool.returnObject(channel);
 
         response.setStatus(HttpServletResponse.SC_OK);
         response.getWriter().write(Constant.SUCCEED);
         response.getWriter().flush();
+    }
+
+    private boolean isValid(SwipeDetails detail) {
+        if (detail.getSwiper() == null || detail.getSwipee() == null) return false;
+        if (!isBetween(detail.getSwiper(), Constant.SWIPE_MINIMUM, Constant.SWIPER_MAX)) return false;
+        if (!isBetween(detail.getSwipee(), Constant.SWIPE_MINIMUM, Constant.SWIPEE_MAX)) return false;
+        if (detail.getComment().length() > Constant.COMMENT_MAX) return false;
+        return true;
+    }
+
+    private boolean isBetween(String str, int start, int end) {
+        for (char ch : str.toCharArray()) {
+            if (!Character.isDigit(ch)) return false;
+        }
+        int val = Integer.parseInt(str);
+        if (val >= start && val <= end) return true;
+        return false;
     }
 }

@@ -1,13 +1,13 @@
 package rmqpool;
 
 import com.rabbitmq.client.Channel;
-import org.apache.commons.pool2.ObjectPool;
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.pool2.impl.GenericObjectPool;
+
+import constant.*;
 
 
 /**
@@ -32,6 +32,7 @@ public class RMQChannelPool {
             Channel chan;
             try {
                 chan = factory.create();
+                chan.exchangeDeclare(Constant.EXCHANGE_NAME, "fanout");
                 pool.put(chan);
             } catch (IOException | InterruptedException ex) {
                 Logger.getLogger(RMQChannelPool.class.getName()).log(Level.SEVERE, null, ex);
@@ -55,7 +56,7 @@ public class RMQChannelPool {
         }
     }
 
-    public void close() {
-        // pool.close();
-    }
+//    public void close() {
+//        // pool.close();
+//    }
 }
