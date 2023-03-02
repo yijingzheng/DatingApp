@@ -21,5 +21,5 @@ public class Constant {
     public static final String DISLIKE = "dislike";
     public static final String SWIPER = "swiper";
     public static final String SWIPEE = "swipee";
-    public static final String STATUS = "status";
+    public static final String USER_LIKED = "userLiked";
 }

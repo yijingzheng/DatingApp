@@ -87,8 +87,8 @@ public class SwipeServlet extends HttpServlet {
         }
 
         JsonObject info = new JsonObject();
-        String status = url.equals(Constant.LEFT) ? Constant.DISLIKE : Constant.LIKE;
-        info.addProperty(Constant.STATUS, status);
+        boolean userLiked = url.equals(Constant.RIGHT);
+        info.addProperty(Constant.USER_LIKED, userLiked);
         info.addProperty(Constant.SWIPER, detail.getSwiper());
         info.addProperty(Constant.SWIPEE, detail.getSwipee());
 
