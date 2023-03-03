@@ -11,8 +11,8 @@ public class Constant {
     public static final String WRONG_URL = "wrong url";
     public static final String INVALID_INPUT = "invalid input";
     public static final String SUCCEED = "succeed";
-    public static final int POOL_SIZE = 10;
-    public static final String HOST = "ec2-34-208-126-158.us-west-2.compute.amazonaws.com";
+    public static final int POOL_SIZE = 30;
+    public static final String HOST = "ec2-35-87-31-101.us-west-2.compute.amazonaws.com";
     public static final String USER = "user";
     public static final String PASSWORD = "password";
     public static final int PORT = 5672;

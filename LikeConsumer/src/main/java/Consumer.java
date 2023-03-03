@@ -12,13 +12,13 @@ public class Consumer {
     private static final String EXCHANGE_NAME = "swipeExchange";
     private static final String QUEUE_NAME = "likeQueue";
     private static final int QUEUE_SIZE = 10;
-    private static final int THREAD_NUM = 150;
     public static final String USER = "user";
     public static final String PASSWORD = "password";
     public static final int PORT = 5672;
 
     public static void main(String[] args) throws IOException, TimeoutException {
         String host = args[0];
+        int THREAD_NUM = Integer.parseInt(args[1]);
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(host);
         factory.setPort(PORT);
