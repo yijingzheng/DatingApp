@@ -5,11 +5,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class client1 {
-    private final static int THREAD_NUM = 400;
-    private final static int TOTAL_REQUESTS = 500000;
-    private final static String url = "http://52.13.27.242:8080/server_war";
 
     public static void main(String[] args) throws InterruptedException {
+        String url = args[0];
+        int THREAD_NUM = Integer.parseInt(args[1]);
+        int TOTAL_REQUESTS = Integer.parseInt(args[2]);
+        //String url = "http://CS6650-alb-1967874639.us-west-2.elb.amazonaws.com/server_war";
+        //int THREAD_NUM = 10;
+        //int TOTAL_REQUESTS = 100;
         CountDownLatch latch = new CountDownLatch(TOTAL_REQUESTS);
         Counter counter = new Counter();
         ExecutorService pool = Executors.newFixedThreadPool(THREAD_NUM);

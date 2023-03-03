@@ -13,14 +13,14 @@ public class Consumer {
     private static final String QUEUE_NAME = "likeQueue";
     private static final int QUEUE_SIZE = 10;
     private static final int THREAD_NUM = 150;
-    public static final String HOST = "localhost";
     public static final String USER = "user";
     public static final String PASSWORD = "password";
     public static final int PORT = 5672;
 
     public static void main(String[] args) throws IOException, TimeoutException {
+        String host = args[0];
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost(HOST);
+        factory.setHost(host);
         factory.setPort(PORT);
         factory.setUsername(USER);
         factory.setPassword(PASSWORD);

@@ -9,9 +9,9 @@ import java.util.Collections;
 import java.util.concurrent.*;
 
 public class client2 {
-    private final static int THREAD_NUM = 400;
+    private final static int THREAD_NUM = 100;
     private final static int TOTAL_REQUESTS = 500000;
-    private final static String url = "http://52.13.27.242:8080/server_war";
+    private final static String url = "http://localhost:8080/server_war";
     private final static String path = THREAD_NUM + "-" + TOTAL_REQUESTS + ".csv";
 
     public static void main(String[] args) throws InterruptedException, IOException {
