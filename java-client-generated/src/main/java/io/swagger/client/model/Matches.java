@@ -21,31 +21,41 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 /**
- * ResponseMsg
+ * Matches
  */
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaClientCodegen", date = "2023-03-29T08:41:20.076931340Z[GMT]")
-public class ResponseMsg {
-  @SerializedName("message")
-  private String message = null;
+public class Matches {
+  @SerializedName("matchList")
+  private List<String> matchList = null;
 
-  public ResponseMsg message(String message) {
-    this.message = message;
+  public Matches matchList(List<String> matchList) {
+    this.matchList = matchList;
+    return this;
+  }
+
+  public Matches addMatchListItem(String matchListItem) {
+    if (this.matchList == null) {
+      this.matchList = new ArrayList<String>();
+    }
+    this.matchList.add(matchListItem);
     return this;
   }
 
    /**
-   * Get message
-   * @return message
+   * Get matchList
+   * @return matchList
   **/
   @Schema(description = "")
-  public String getMessage() {
-    return message;
+  public List<String> getMatchList() {
+    return matchList;
   }
 
-  public void setMessage(String message) {
-    this.message = message;
+  public void setMatchList(List<String> matchList) {
+    this.matchList = matchList;
   }
 
 
@@ -57,22 +67,22 @@ public class ResponseMsg {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ResponseMsg responseMsg = (ResponseMsg) o;
-    return Objects.equals(this.message, responseMsg.message);
+    Matches matches = (Matches) o;
+    return Objects.equals(this.matchList, matches.matchList);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(message);
+    return Objects.hash(matchList);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ResponseMsg {\n");
+    sb.append("class Matches {\n");
     
-    sb.append("    message: ").append(toIndentedString(message)).append("\n");
+    sb.append("    matchList: ").append(toIndentedString(matchList)).append("\n");
     sb.append("}");
     return sb.toString();
   }

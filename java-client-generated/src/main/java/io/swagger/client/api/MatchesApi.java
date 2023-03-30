@@ -26,8 +26,8 @@ import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 
 
+import io.swagger.client.model.Matches;
 import io.swagger.client.model.ResponseMsg;
-import io.swagger.client.model.SwipeDetails;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -35,14 +35,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SwipeApi {
+public class MatchesApi {
     private ApiClient apiClient;
 
-    public SwipeApi() {
+    public MatchesApi() {
         this(Configuration.getDefaultApiClient());
     }
 
-    public SwipeApi(ApiClient apiClient) {
+    public MatchesApi(ApiClient apiClient) {
         this.apiClient = apiClient;
     }
 
@@ -55,20 +55,19 @@ public class SwipeApi {
     }
 
     /**
-     * Build call for swipe
-     * @param body response details (required)
-     * @param leftorright value should be \&quot;left\&quot; or \&quot;right\&quot; (required)
+     * Build call for matches
+     * @param userID user to return matches for (required)
      * @param progressListener Progress listener
      * @param progressRequestListener Progress request listener
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call swipeCall(SwipeDetails body, String leftorright, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
-        Object localVarPostBody = body;
+    public com.squareup.okhttp.Call matchesCall(String userID, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        Object localVarPostBody = null;
         
         // create path and map variables
-        String localVarPath = "/swipe/{leftorright}/"
-            .replaceAll("\\{" + "leftorright" + "\\}", apiClient.escapeString(leftorright.toString()));
+        String localVarPath = "/matches/{userID}/"
+            .replaceAll("\\{" + "userID" + "\\}", apiClient.escapeString(userID.toString()));
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
         List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
@@ -84,7 +83,7 @@ public class SwipeApi {
         if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
 
         final String[] localVarContentTypes = {
-            "application/json"
+            
         };
         final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
         localVarHeaderParams.put("Content-Type", localVarContentType);
@@ -102,21 +101,17 @@ public class SwipeApi {
         }
 
         String[] localVarAuthNames = new String[] {  };
-        return apiClient.buildCall(localVarPath, "POST", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
+        return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
     @SuppressWarnings("rawtypes")
-    private com.squareup.okhttp.Call swipeValidateBeforeCall(SwipeDetails body, String leftorright, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
-        // verify the required parameter 'body' is set
-        if (body == null) {
-            throw new ApiException("Missing the required parameter 'body' when calling swipe(Async)");
-        }
-        // verify the required parameter 'leftorright' is set
-        if (leftorright == null) {
-            throw new ApiException("Missing the required parameter 'leftorright' when calling swipe(Async)");
+    private com.squareup.okhttp.Call matchesValidateBeforeCall(String userID, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        // verify the required parameter 'userID' is set
+        if (userID == null) {
+            throw new ApiException("Missing the required parameter 'userID' when calling matches(Async)");
         }
         
-        com.squareup.okhttp.Call call = swipeCall(body, leftorright, progressListener, progressRequestListener);
+        com.squareup.okhttp.Call call = matchesCall(userID, progressListener, progressRequestListener);
         return call;
 
         
@@ -127,38 +122,38 @@ public class SwipeApi {
 
     /**
      * 
-     * Swipe left or right
-     * @param body response details (required)
-     * @param leftorright value should be \&quot;left\&quot; or \&quot;right\&quot; (required)
+     * return a maximum of 100 potential matches for a user
+     * @param userID user to return matches for (required)
+     * @return Matches
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public void swipe(SwipeDetails body, String leftorright) throws ApiException {
-        swipeWithHttpInfo(body, leftorright);
+    public Matches matches(String userID) throws ApiException {
+        ApiResponse<Matches> resp = matchesWithHttpInfo(userID);
+        return resp.getData();
     }
 
     /**
      * 
-     * Swipe left or right
-     * @param body response details (required)
-     * @param leftorright value should be \&quot;left\&quot; or \&quot;right\&quot; (required)
-     * @return ApiResponse&lt;Void&gt;
+     * return a maximum of 100 potential matches for a user
+     * @param userID user to return matches for (required)
+     * @return ApiResponse&lt;Matches&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<Void> swipeWithHttpInfo(SwipeDetails body, String leftorright) throws ApiException {
-        com.squareup.okhttp.Call call = swipeValidateBeforeCall(body, leftorright, null, null);
-        return apiClient.execute(call);
+    public ApiResponse<Matches> matchesWithHttpInfo(String userID) throws ApiException {
+        com.squareup.okhttp.Call call = matchesValidateBeforeCall(userID, null, null);
+        Type localVarReturnType = new TypeToken<Matches>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
     }
 
     /**
      *  (asynchronously)
-     * Swipe left or right
-     * @param body response details (required)
-     * @param leftorright value should be \&quot;left\&quot; or \&quot;right\&quot; (required)
+     * return a maximum of 100 potential matches for a user
+     * @param userID user to return matches for (required)
      * @param callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
      */
-    public com.squareup.okhttp.Call swipeAsync(SwipeDetails body, String leftorright, final ApiCallback<Void> callback) throws ApiException {
+    public com.squareup.okhttp.Call matchesAsync(String userID, final ApiCallback<Matches> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -179,8 +174,9 @@ public class SwipeApi {
             };
         }
 
-        com.squareup.okhttp.Call call = swipeValidateBeforeCall(body, leftorright, progressListener, progressRequestListener);
-        apiClient.executeAsync(call, callback);
+        com.squareup.okhttp.Call call = matchesValidateBeforeCall(userID, progressListener, progressRequestListener);
+        Type localVarReturnType = new TypeToken<Matches>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
         return call;
     }
 }

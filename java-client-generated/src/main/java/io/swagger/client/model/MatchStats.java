@@ -22,30 +22,51 @@ import com.google.gson.stream.JsonWriter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.IOException;
 /**
- * ResponseMsg
+ * MatchStats
  */
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaClientCodegen", date = "2023-03-29T08:41:20.076931340Z[GMT]")
-public class ResponseMsg {
-  @SerializedName("message")
-  private String message = null;
+public class MatchStats {
+  @SerializedName("numLlikes")
+  private Integer numLlikes = null;
 
-  public ResponseMsg message(String message) {
-    this.message = message;
+  @SerializedName("numDislikes")
+  private Integer numDislikes = null;
+
+  public MatchStats numLlikes(Integer numLlikes) {
+    this.numLlikes = numLlikes;
     return this;
   }
 
    /**
-   * Get message
-   * @return message
+   * Get numLlikes
+   * @return numLlikes
   **/
-  @Schema(description = "")
-  public String getMessage() {
-    return message;
+  @Schema(example = "72", description = "")
+  public Integer getNumLlikes() {
+    return numLlikes;
   }
 
-  public void setMessage(String message) {
-    this.message = message;
+  public void setNumLlikes(Integer numLlikes) {
+    this.numLlikes = numLlikes;
+  }
+
+  public MatchStats numDislikes(Integer numDislikes) {
+    this.numDislikes = numDislikes;
+    return this;
+  }
+
+   /**
+   * Get numDislikes
+   * @return numDislikes
+  **/
+  @Schema(example = "489", description = "")
+  public Integer getNumDislikes() {
+    return numDislikes;
+  }
+
+  public void setNumDislikes(Integer numDislikes) {
+    this.numDislikes = numDislikes;
   }
 
 
@@ -57,22 +78,24 @@ public class ResponseMsg {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ResponseMsg responseMsg = (ResponseMsg) o;
-    return Objects.equals(this.message, responseMsg.message);
+    MatchStats matchStats = (MatchStats) o;
+    return Objects.equals(this.numLlikes, matchStats.numLlikes) &&
+        Objects.equals(this.numDislikes, matchStats.numDislikes);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(message);
+    return Objects.hash(numLlikes, numDislikes);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ResponseMsg {\n");
+    sb.append("class MatchStats {\n");
     
-    sb.append("    message: ").append(toIndentedString(message)).append("\n");
+    sb.append("    numLlikes: ").append(toIndentedString(numLlikes)).append("\n");
+    sb.append("    numDislikes: ").append(toIndentedString(numDislikes)).append("\n");
     sb.append("}");
     return sb.toString();
   }

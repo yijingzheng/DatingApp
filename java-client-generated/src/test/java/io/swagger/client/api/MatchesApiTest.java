@@ -12,8 +12,8 @@
 
 package io.swagger.client.api;
 
+import io.swagger.client.model.Matches;
 import io.swagger.client.model.ResponseMsg;
-import io.swagger.client.model.SwipeDetails;
 import org.junit.Test;
 import org.junit.Ignore;
 
@@ -25,26 +25,25 @@ import java.util.Map;
 
 
 /**
- * API tests for SwipeApi
+ * API tests for MatchesApi
  */
 @Ignore
-public class SwipeApiTest {
+public class MatchesApiTest {
 
-    private final SwipeApi api = new SwipeApi();
+    private final MatchesApi api = new MatchesApi();
 
     /**
      * 
      *
-     * Swipe left or right
+     * return a maximum of 100 potential matches for a user
      *
      * @throws Exception
      *          if the Api call fails
      */
     @Test
-    public void swipeTest() throws Exception {
-        SwipeDetails body = null;
-        String leftorright = null;
-        api.swipe(body, leftorright);
+    public void matchesTest() throws Exception {
+        String userID = null;
+        Matches response = api.matches(userID);
 
         // TODO: test validations
     }

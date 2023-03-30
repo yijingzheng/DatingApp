@@ -12,8 +12,8 @@
 
 package io.swagger.client.api;
 
+import io.swagger.client.model.MatchStats;
 import io.swagger.client.model.ResponseMsg;
-import io.swagger.client.model.SwipeDetails;
 import org.junit.Test;
 import org.junit.Ignore;
 
@@ -25,26 +25,25 @@ import java.util.Map;
 
 
 /**
- * API tests for SwipeApi
+ * API tests for StatsApi
  */
 @Ignore
-public class SwipeApiTest {
+public class StatsApiTest {
 
-    private final SwipeApi api = new SwipeApi();
+    private final StatsApi api = new StatsApi();
 
     /**
      * 
      *
-     * Swipe left or right
+     * return number of likes and dislikes for a user
      *
      * @throws Exception
      *          if the Api call fails
      */
     @Test
-    public void swipeTest() throws Exception {
-        SwipeDetails body = null;
-        String leftorright = null;
-        api.swipe(body, leftorright);
+    public void matchStatsTest() throws Exception {
+        String userID = null;
+        MatchStats response = api.matchStats(userID);
 
         // TODO: test validations
     }
