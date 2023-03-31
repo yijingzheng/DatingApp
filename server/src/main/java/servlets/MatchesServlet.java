@@ -1,7 +1,7 @@
 package servlets;
 
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Projections;
+import com.google.gson.Gson;
+import com.mongodb.client.*;
 import constant.Constant;
 
 import javax.servlet.ServletException;
@@ -10,19 +10,21 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
-import com.mongodb.client.MongoCollection;
 import com.mongodb.*;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoDatabase;
+import model.Matches;
 import org.bson.Document;
-import org.bson.conversions.Bson;
 
 @WebServlet(name = "MatchesServlet", value = "/matches")
 public class MatchesServlet extends HttpServlet {
 
-    private MongoDatabase database;
+    private HashMap<String, Matches> matchesCollection = new HashMap<>();
+    private Gson gson = new Gson();
 
     @Override
     public void init() throws ServletException {
@@ -34,7 +36,26 @@ public class MatchesServlet extends HttpServlet {
                         .build())
                 .build();
         MongoClient mongoClient = MongoClients.create(settings);
-        this.database = mongoClient.getDatabase(Constant.DB_NAME);
+        MongoDatabase database = mongoClient.getDatabase(Constant.DB_NAME);
+
+        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+        executorService.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                HashMap<String, Matches> temp = new HashMap<>();
+                MongoCollection<Document> collection = database.getCollection(Constant.COLLECTION_MATCHES);
+                MongoCursor<Document> cursor = collection.find().iterator();
+                try {
+                    while(cursor.hasNext()) {
+                        Document doc = cursor.next();
+                        temp.put(doc.getString("swiper"), new Matches(doc.getList("matchList", String.class)));
+                    }
+                } finally {
+                    matchesCollection = temp;
+                    cursor.close();
+                }
+            }
+        }, 0, Constant.PERIOD, TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -57,19 +78,11 @@ public class MatchesServlet extends HttpServlet {
         }
 
         String userId = urlParts[1];
-        MongoCollection<Document> collection = database.getCollection(Constant.COLLECTION_MATCHES);
-        Bson filter = Filters.eq("swiper", userId);
-        Bson projectionFields = Projections.fields(Projections.include("matchList"),Projections.excludeId());
-        Document result = collection.find(filter).projection(projectionFields).first();
-        if (result == null) {
+        if (!matchesCollection.containsKey(userId)) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         } else {
             response.setStatus(HttpServletResponse.SC_OK);
-            //List<String> matchList = result.getList("candidate", String.class);
-            //Matches matches = new Matches(matchList);
-            response.getWriter().write(result.toJson());
-            //Gson gson = new Gson();
-            //response.getWriter().write(gson.toJson(matches));
+            response.getWriter().write(gson.toJson(matchesCollection.get(userId)));
             response.getWriter().flush();
         }
     }

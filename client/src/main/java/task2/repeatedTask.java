@@ -29,18 +29,19 @@ public class repeatedTask extends TimerTask {
 
     @Override
     public void run() {
+        long start = System.currentTimeMillis();
         try {
-            long start = System.currentTimeMillis();
             if (num % 2 == 0) {
                 matchesApi.matches(String.valueOf(rand.nextInt()) + 1);
             } else {
                 statsApi.matchStats(String.valueOf(rand.nextInt()) + 1);
             }
+        } catch (ApiException e) {
+            //System.err.println(e.getCode());
+            //e.printStackTrace();
+        } finally {
             long end = System.currentTimeMillis();
             latency.add(end - start);
-        } catch (ApiException e) {
-            System.err.println("Exception when calling MatchesApi#matches");
-            e.printStackTrace();
         }
     }
 }

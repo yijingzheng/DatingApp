@@ -1,7 +1,7 @@
 package servlets;
 
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Projections;
+import com.google.gson.Gson;
+import com.mongodb.client.*;
 import constant.Constant;
 
 import javax.servlet.ServletException;
@@ -10,18 +10,19 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
-import com.mongodb.client.MongoCollection;
 import com.mongodb.*;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoDatabase;
+import model.MatchStats;
 import org.bson.Document;
-import org.bson.conversions.Bson;
 
 @WebServlet(name = "StatsServlet", value = "/stats")
 public class StatsServlet extends HttpServlet {
-    private MongoDatabase database;
+    private Gson gson = new Gson();
+    private HashMap<String, MatchStats> statsCollection = new HashMap<>();
 
     @Override
     public void init() throws ServletException {
@@ -33,7 +34,27 @@ public class StatsServlet extends HttpServlet {
                         .build())
                 .build();
         MongoClient mongoClient = MongoClients.create(settings);
-        this.database = mongoClient.getDatabase(Constant.DB_NAME);
+        MongoDatabase database = mongoClient.getDatabase(Constant.DB_NAME);
+
+        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+        executorService.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                HashMap<String, MatchStats> temp = new HashMap<>();
+                MongoCollection<Document> collection = database.getCollection(Constant.COLLECTION_STATS);
+                MongoCursor<Document> cursor = collection.find().iterator();
+                try {
+                    while(cursor.hasNext()) {
+                        Document doc = cursor.next();
+                        temp.put(doc.getString("swiper"), new MatchStats(doc.getInteger("numLlikes"), doc.getInteger("numDislikes")));
+                    }
+                } finally {
+                    statsCollection = temp;
+                    cursor.close();
+                }
+            }
+        }, 0, Constant.PERIOD, TimeUnit.MILLISECONDS);
+
     }
 
     @Override
@@ -56,18 +77,11 @@ public class StatsServlet extends HttpServlet {
         }
 
         String userId = urlParts[1];
-        MongoCollection<Document> collection = database.getCollection(Constant.COLLECTION_STATS);
-        Bson filter = Filters.eq("swiper", userId);
-        Bson projectionFields = Projections.fields(Projections.include("numLlikes", "numDislikes"),Projections.excludeId());
-        Document result = collection.find(filter).projection(projectionFields).first();
-        if (result == null) {
+        if (!statsCollection.containsKey(userId)) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         } else {
             response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write(result.toJson());
-//            Gson gson = new Gson();
-//            MatchStats matchStats = new MatchStats(result.getInteger("numLlikes"), result.getInteger("numDislikes"));
-//            response.getWriter().write(gson.toJson(matchStats));
+            response.getWriter().write(gson.toJson(statsCollection.get(userId)));
             response.getWriter().flush();
         }
     }

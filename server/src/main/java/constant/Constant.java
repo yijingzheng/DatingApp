@@ -12,7 +12,7 @@ public class Constant {
     public static final String INVALID_INPUT = "invalid input";
     public static final String SUCCEED = "succeed";
     public static final int POOL_SIZE = 30;
-    public static final String HOST = "localhost";
+    public static final String HOST = "ec2-35-91-237-127.us-west-2.compute.amazonaws.com";
     public static final String USER = "user";
     public static final String PASSWORD = "password";
     public static final int PORT = 5672;
@@ -24,4 +24,5 @@ public class Constant {
     public static final String DB_NAME = "swipedata";
     public static final String COLLECTION_STATS = "stats";
     public static final String COLLECTION_MATCHES = "matches";
+    public static final long PERIOD = 3000;
 }

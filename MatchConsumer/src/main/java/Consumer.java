@@ -4,8 +4,7 @@ import com.rabbitmq.client.ConnectionFactory;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.mongodb.*;
@@ -53,11 +52,11 @@ public class Consumer {
         MongoDatabase database = mongoClient.getDatabase("swipedata");
 
         // all potential matches for one user
-        Map<Integer, Set<Integer>> matchAllTime = new ConcurrentHashMap<>();
+        Map<String, Set<String>> matchAllTime = new ConcurrentHashMap<>();
         // potential matches during one updating period
-        Map<Integer, Set<Integer>> matchRecord = new ConcurrentHashMap<>();
+        Map<String, Set<String>> matchRecord = new ConcurrentHashMap<>();
         // like and dislike numbers during one updating period
-        Map<Integer, AtomicInteger[]> statRecord = new ConcurrentHashMap<>();
+        Map<String, AtomicInteger[]> statRecord = new ConcurrentHashMap<>();
         for (int i = 0; i < THREAD_NUM; i++) {
             Thread thread = new Thread(new ConsumerThread(EXCHANGE_NAME, QUEUE_NAME, connection, matchAllTime, matchRecord, statRecord, QUEUE_SIZE));
             thread.start();
@@ -67,18 +66,17 @@ public class Consumer {
     }
 
     /** connect to the db and update documents every PERIOD millisecond */
-    private static void updateDB(MongoDatabase database, Map<Integer, Set<Integer>> matchRecord, Map<Integer, AtomicInteger[]> statRecord) {
-        TimerTask repeatedTask = new repeatedTask(database, matchRecord, statRecord);
-        Timer timer = new Timer();
-        timer.schedule(repeatedTask, 0, PERIOD);
+    private static void updateDB(MongoDatabase database, Map<String, Set<String>> matchRecord, Map<String, AtomicInteger[]> statRecord) {
+        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+        executorService.scheduleAtFixedRate(new repeatedTask(database, matchRecord, statRecord), 0, PERIOD, TimeUnit.MILLISECONDS);
     }
 
-    static class repeatedTask extends TimerTask {
+    static class repeatedTask implements Runnable {
         private MongoDatabase database;
-        private Map<Integer, Set<Integer>> matchRecord;
-        private Map<Integer, AtomicInteger[]> statRecord;
+        private Map<String, Set<String>> matchRecord;
+        private Map<String, AtomicInteger[]> statRecord;
 
-        public repeatedTask(MongoDatabase database, Map<Integer, Set<Integer>> matchRecord, Map<Integer, AtomicInteger[]> statRecord) {
+        public repeatedTask(MongoDatabase database, Map<String, Set<String>> matchRecord, Map<String, AtomicInteger[]> statRecord) {
             this.database = database;
             this.matchRecord = matchRecord;
             this.statRecord = statRecord;
@@ -87,12 +85,12 @@ public class Consumer {
         @Override
         public void run() {
             if (statRecord.isEmpty()) return;
-            Map<Integer, AtomicInteger[]> tempStat = new ConcurrentHashMap<>(statRecord);
-            Map<Integer, Set<Integer>> tempMatch = new ConcurrentHashMap<>(matchRecord);
+            Map<String, AtomicInteger[]> tempStat = new ConcurrentHashMap<>(statRecord);
+            Map<String, Set<String>> tempMatch = new ConcurrentHashMap<>(matchRecord);
             statRecord.clear();
             matchRecord.clear();
             MongoCollection<Document> collection = database.getCollection("stats");
-            for (int swiper : tempStat.keySet()) {
+            for (String swiper : tempStat.keySet()) {
                 Bson filter = Filters.eq("swiper", swiper);
                 Bson update = Updates.combine(Updates.inc("numLlikes", tempStat.get(swiper)[0]),
                         Updates.inc("numDislikes", tempStat.get(swiper)[1]));
@@ -100,9 +98,10 @@ public class Consumer {
                 collection.updateOne(filter, update, options);
             }
             collection = database.getCollection("matches");
-            for (int swiper : tempMatch.keySet()) {
+            for (String swiper : tempMatch.keySet()) {
                 Bson filter = Filters.eq("swiper", swiper);
                 Bson update = Updates.pushEach("matchList", new ArrayList<>(tempMatch.get(swiper)));
+                UpdateOptions options = new UpdateOptions().upsert(true);
                 collection.updateOne(filter, update, options);
             }
         }

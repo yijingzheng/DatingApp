@@ -11,12 +11,12 @@ public class client1 {
     private static final int GET_PER_SECOND = 5;
 
     public static void main(String[] args) throws InterruptedException {
-        String url = args[0];
-        int THREAD_NUM = Integer.parseInt(args[1]);
-        int TOTAL_REQUESTS = Integer.parseInt(args[2]);
-        //String url = "http://CS6650-alb-1967874639.us-west-2.elb.amazonaws.com/server_war";
-        //int THREAD_NUM = 10;
-        //int TOTAL_REQUESTS = 100;
+//        String url = args[0];
+//        int THREAD_NUM = Integer.parseInt(args[1]);
+//        int TOTAL_REQUESTS = Integer.parseInt(args[2]);
+        String url = "http://54.212.3.218:8080/server_war/";
+        int THREAD_NUM = 100;
+        int TOTAL_REQUESTS = 500000;
         CountDownLatch latch = new CountDownLatch(TOTAL_REQUESTS);
         Counter counter = new Counter();
         ArrayList<ArrayList<Long>> getResponseTime = new ArrayList<>();
