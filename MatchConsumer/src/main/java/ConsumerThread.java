@@ -18,20 +18,20 @@ public class ConsumerThread implements Runnable {
     private Connection connection;
     private Map<Integer, Set<Integer>> matchAllTime;
     private Map<Integer, Set<Integer>> matchRecord;
-    private Map<Integer, AtomicInteger[]> statusRecord;
+    private Map<Integer, AtomicInteger[]> statRecord;
     private int queueSize;
     private Gson gson = new Gson();
-    private static final int MATCHES_NUM = 3;
+    private static final int MATCHES_NUM = 100;
     private static final boolean DURABLE = true; // persistent queue
 
     public ConsumerThread(String exchangeName, String queueName, Connection connection, Map<Integer, Set<Integer>> matchAllTime,
-                          Map<Integer, Set<Integer>> matchRecord, Map<Integer, AtomicInteger[]> statusRecord, int queueSize) {
+                          Map<Integer, Set<Integer>> matchRecord, Map<Integer, AtomicInteger[]> statRecord, int queueSize) {
         this.exchangeName = exchangeName;
         this.queueName = queueName;
         this.connection = connection;
         this.matchAllTime = matchAllTime;
         this.matchRecord = matchRecord;
-        this.statusRecord = statusRecord;
+        this.statRecord = statRecord;
         this.queueSize = queueSize;
     }
 
@@ -57,7 +57,6 @@ public class ConsumerThread implements Runnable {
                         matchAllTime.put(swiper, mySet);
                     }
                     if (matchAllTime.get(swiper).size() < MATCHES_NUM) {
-                        System.out.println(swiper + " " + matchAllTime.get(swiper).size());
                         int swipee = info.get("swipee").getAsInt();
                         if (matchAllTime.get(swiper).add(swipee)) {
                             if (!matchRecord.containsKey(swiper)) {
@@ -68,10 +67,10 @@ public class ConsumerThread implements Runnable {
                         }
                     }
                 }
-                if (!statusRecord.containsKey(swiper)) {
-                    statusRecord.put(swiper, new AtomicInteger[]{new AtomicInteger(0), new AtomicInteger(0)});
+                if (!statRecord.containsKey(swiper)) {
+                    statRecord.put(swiper, new AtomicInteger[]{new AtomicInteger(0), new AtomicInteger(0)});
                 }
-                statusRecord.get(swiper)[idx].incrementAndGet();
+                statRecord.get(swiper)[idx].incrementAndGet();
                 channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
             };
             channel.basicConsume(queueName, false, deliverCallback, consumerTag -> { });
