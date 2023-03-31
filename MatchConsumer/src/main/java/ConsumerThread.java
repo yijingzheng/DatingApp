@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -15,16 +16,22 @@ public class ConsumerThread implements Runnable {
     private String exchangeName;
     private String queueName;
     private Connection connection;
-    private Map<Integer, Set<Integer>> record;
+    private Map<Integer, Set<Integer>> matchAllTime;
+    private Map<Integer, Set<Integer>> matchRecord;
+    private Map<Integer, AtomicInteger[]> statRecord;
     private int queueSize;
     private Gson gson = new Gson();
     private static final int MATCHES_NUM = 100;
+    private static final boolean DURABLE = true; // persistent queue
 
-    public ConsumerThread(String exchangeName, String queueName, Connection connection, Map<Integer, Set<Integer>> record, int queueSize) {
+    public ConsumerThread(String exchangeName, String queueName, Connection connection, Map<Integer, Set<Integer>> matchAllTime,
+                          Map<Integer, Set<Integer>> matchRecord, Map<Integer, AtomicInteger[]> statRecord, int queueSize) {
         this.exchangeName = exchangeName;
         this.queueName = queueName;
         this.connection = connection;
-        this.record = record;
+        this.matchAllTime = matchAllTime;
+        this.matchRecord = matchRecord;
+        this.statRecord = statRecord;
         this.queueSize = queueSize;
     }
 
@@ -33,7 +40,7 @@ public class ConsumerThread implements Runnable {
         try {
             Channel channel = connection.createChannel();
             // Name, Durable (survive a broker restart), Exclusive (used by only one connection), Auto-delete, Arguments
-            channel.queueDeclare(queueName, false, false, false, null);
+            channel.queueDeclare(queueName, DURABLE, false, false, null);
             channel.exchangeDeclare(exchangeName, "fanout");
             channel.queueBind(queueName, exchangeName, "");
             channel.basicQos(queueSize);
@@ -43,14 +50,27 @@ public class ConsumerThread implements Runnable {
                 JsonObject info = this.gson.fromJson(message, JsonObject.class);
                 int swiper = info.get("swiper").getAsInt();
                 boolean userLiked = info.get("userLiked").getAsBoolean();
-                if (!record.containsKey(swiper)) {
-                    Set<Integer> mySet = ConcurrentHashMap.newKeySet();
-                    record.put(swiper, mySet);
+                int idx = userLiked ? 0 : 1;
+                if (userLiked) {
+                    if (!matchAllTime.containsKey(swiper)) {
+                        Set<Integer> mySet = ConcurrentHashMap.newKeySet();
+                        matchAllTime.put(swiper, mySet);
+                    }
+                    if (matchAllTime.get(swiper).size() < MATCHES_NUM) {
+                        int swipee = info.get("swipee").getAsInt();
+                        if (matchAllTime.get(swiper).add(swipee)) {
+                            if (!matchRecord.containsKey(swiper)) {
+                                Set<Integer> mySet = ConcurrentHashMap.newKeySet();
+                                matchRecord.put(swiper, mySet);
+                            }
+                            matchRecord.get(swiper).add(swipee);
+                        }
+                    }
                 }
-                if (userLiked && record.get(swiper).size() < MATCHES_NUM) {
-                    int swipee = info.get("swipee").getAsInt();
-                    record.get(swiper).add(swipee);
+                if (!statRecord.containsKey(swiper)) {
+                    statRecord.put(swiper, new AtomicInteger[]{new AtomicInteger(0), new AtomicInteger(0)});
                 }
+                statRecord.get(swiper)[idx].incrementAndGet();
                 channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
             };
             channel.basicConsume(queueName, false, deliverCallback, consumerTag -> { });

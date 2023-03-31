@@ -1,8 +1,8 @@
 # swagger-java-client
 
 twinder
-- API version: 1.0.0
-  - Build date: 2023-01-31T09:20:33.275Z[GMT]
+- API version: 1.2.1
+  - Build date: 2023-03-29T08:41:20.076931340Z[GMT]
 
 CS6650 assignment API
 
@@ -74,22 +74,22 @@ Please follow the [installation](#installation) instruction and execute the foll
 import io.swagger.client.*;
 import io.swagger.client.auth.*;
 import io.swagger.client.model.*;
-import io.swagger.client.api.SwipeApi;
+import io.swagger.client.api.MatchesApi;
 
 import java.io.File;
 import java.util.*;
 
-public class SwipeApiExample {
+public class MatchesApiExample {
 
     public static void main(String[] args) {
         
-        SwipeApi apiInstance = new SwipeApi();
-        SwipeDetails body = new SwipeDetails(); // SwipeDetails | response details
-        String leftorright = "leftorright_example"; // String | Ilike or dislike user
+        MatchesApi apiInstance = new MatchesApi();
+        String userID = "userID_example"; // String | user to return matches for
         try {
-            apiInstance.swipe(body, leftorright);
+            Matches result = apiInstance.matches(userID);
+            System.out.println(result);
         } catch (ApiException e) {
-            System.err.println("Exception when calling SwipeApi#swipe");
+            System.err.println("Exception when calling MatchesApi#matches");
             e.printStackTrace();
         }
     }
@@ -98,14 +98,18 @@ public class SwipeApiExample {
 
 ## Documentation for API Endpoints
 
-All URIs are relative to *https://virtserver.swaggerhub.com/IGORTON/Twinder/1.0.0*
+All URIs are relative to *https://virtserver.swaggerhub.com/IGORTON/Twinder/1.2.1*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*MatchesApi* | [**matches**](docs/MatchesApi.md#matches) | **GET** /matches/{userID}/ | 
+*StatsApi* | [**matchStats**](docs/StatsApi.md#matchStats) | **GET** /stats/{userID}/ | 
 *SwipeApi* | [**swipe**](docs/SwipeApi.md#swipe) | **POST** /swipe/{leftorright}/ | 
 
 ## Documentation for Models
 
+ - [MatchStats](docs/MatchStats.md)
+ - [Matches](docs/Matches.md)
  - [ResponseMsg](docs/ResponseMsg.md)
  - [SwipeDetails](docs/SwipeDetails.md)
 

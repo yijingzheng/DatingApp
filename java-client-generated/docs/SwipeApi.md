@@ -1,6 +1,6 @@
 # SwipeApi
 
-All URIs are relative to *https://virtserver.swaggerhub.com/IGORTON/Twinder/1.0.0*
+All URIs are relative to *https://virtserver.swaggerhub.com/IGORTON/Twinder/1.2.1*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
@@ -23,7 +23,7 @@ Swipe left or right
 
 SwipeApi apiInstance = new SwipeApi();
 SwipeDetails body = new SwipeDetails(); // SwipeDetails | response details
-String leftorright = "leftorright_example"; // String | Ilike or dislike user
+String leftorright = "leftorright_example"; // String | value should be \"left\" or \"right\"
 try {
     apiInstance.swipe(body, leftorright);
 } catch (ApiException e) {
@@ -37,7 +37,7 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **body** | [**SwipeDetails**](SwipeDetails.md)| response details |
- **leftorright** | **String**| Ilike or dislike user |
+ **leftorright** | **String**| value should be \&quot;left\&quot; or \&quot;right\&quot; |
 
 ### Return type
 

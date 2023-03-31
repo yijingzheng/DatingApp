@@ -12,14 +12,16 @@ public class Constant {
     public static final String INVALID_INPUT = "invalid input";
     public static final String SUCCEED = "succeed";
     public static final int POOL_SIZE = 30;
-    public static final String HOST = "ec2-35-87-31-101.us-west-2.compute.amazonaws.com";
+    public static final String HOST = "localhost";
     public static final String USER = "user";
     public static final String PASSWORD = "password";
     public static final int PORT = 5672;
     public static final String EXCHANGE_NAME = "swipeExchange";
-    public static final String LIKE = "like";
-    public static final String DISLIKE = "dislike";
     public static final String SWIPER = "swiper";
     public static final String SWIPEE = "swipee";
     public static final String USER_LIKED = "userLiked";
+    public static final String MONGO_URL = "mongodb+srv://user:myPassword01@swipedata.jj8l3l3.mongodb.net/?retryWrites=true&w=majority";
+    public static final String DB_NAME = "swipedata";
+    public static final String COLLECTION_STATS = "stats";
+    public static final String COLLECTION_MATCHES = "matches";
 }
