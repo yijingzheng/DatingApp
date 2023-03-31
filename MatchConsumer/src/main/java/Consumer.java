@@ -103,10 +103,8 @@ public class Consumer {
             for (int swiper : tempMatch.keySet()) {
                 Bson filter = Filters.eq("swiper", swiper);
                 Bson update = Updates.pushEach("matchList", new ArrayList<>(tempMatch.get(swiper)));
-                UpdateOptions options = new UpdateOptions().upsert(true);
                 collection.updateOne(filter, update, options);
             }
         }
     }
-
 }
