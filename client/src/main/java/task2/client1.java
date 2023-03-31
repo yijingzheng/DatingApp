@@ -1,10 +1,7 @@
 package task2;
 
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 public class client1 {
 
@@ -14,13 +11,12 @@ public class client1 {
 //        String url = args[0];
 //        int THREAD_NUM = Integer.parseInt(args[1]);
 //        int TOTAL_REQUESTS = Integer.parseInt(args[2]);
-        String url = "http://54.212.3.218:8080/server_war/";
+        String url = "http://54.185.12.133:8080/server_war/";
         int THREAD_NUM = 100;
         int TOTAL_REQUESTS = 500000;
         CountDownLatch latch = new CountDownLatch(TOTAL_REQUESTS);
         Counter counter = new Counter();
         ArrayList<ArrayList<Long>> getResponseTime = new ArrayList<>();
-        Timer[] timers = new Timer[GET_PER_SECOND];
 
         ExecutorService pool = Executors.newFixedThreadPool(THREAD_NUM);
         long start = System.currentTimeMillis();
@@ -29,17 +25,15 @@ public class client1 {
             pool.execute(clientThread);
         }
 
+        ScheduledExecutorService service = Executors.newScheduledThreadPool(GET_PER_SECOND);
         for (int i = 0; i < GET_PER_SECOND; i++) {
             getResponseTime.add(new ArrayList<>());
-            timers[i] = new Timer();
-            timers[i].scheduleAtFixedRate(new repeatedTask(url, i, getResponseTime.get(i), 5000), 0, 1000);
+            service.scheduleAtFixedRate(new repeatedTask(url, i, getResponseTime.get(i), 5000), 0, 1, TimeUnit.SECONDS);
         }
 
         latch.await();
 
-        for (Timer timer : timers) {
-            timer.cancel();
-        }
+        service.shutdown();
         counter.setStop(true);
         pool.shutdown();
         long end = System.currentTimeMillis();

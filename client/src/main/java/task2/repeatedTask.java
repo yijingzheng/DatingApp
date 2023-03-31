@@ -6,9 +6,8 @@ import io.swagger.client.api.StatsApi;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.TimerTask;
 
-public class repeatedTask extends TimerTask {
+public class repeatedTask implements Runnable {
 
     private MatchesApi matchesApi;
     private StatsApi statsApi;
